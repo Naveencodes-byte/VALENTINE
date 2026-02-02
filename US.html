@@ -12,8 +12,8 @@
     background: linear-gradient(to bottom, #ffafbd, #ffc3a0);
     overflow: hidden;
     height: 100vh;
-    position: relative;
     color: white;
+    position: relative;
   }
 
   h1 {
@@ -27,31 +27,24 @@
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    margin: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
     color: white;
-    position: relative;
+    position: absolute;
+    transition: transform 0.2s, font-size 0.2s;
   }
 
-  #yesBtn { background: #e91e63; }
-  #noBtn { background: #9c27b0; }
-
-  /* Pulse animation for Yes button */
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-  }
+  #yesBtn { background: #e91e63; z-index: 2; }
+  #noBtn { background: #9c27b0; z-index: 1; }
 
   #messageBox {
     font-size: 26px;
     margin-top: 50px;
-    display: none;
+    display: block;
+    position: relative;
     min-height: 40px;
+    top: 200px;
   }
 
-  /* Hearts */
   .heart {
     position: absolute;
     font-size: 24px;
@@ -70,15 +63,13 @@
 
 <h1>Will you be my Valentine? 👀</h1>
 
-<button class="btn" id="yesBtn">Yes!</button>
 <button class="btn" id="noBtn">No 😢</button>
+<button class="btn" id="yesBtn">Yes!</button>
 
 <div id="messageBox"></div>
 
-<!-- Background music -->
 <audio id="bg-music" loop>
   <source src="romantic.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
 </audio>
 
 <script>
@@ -87,7 +78,6 @@ const noBtn = document.getElementById('noBtn');
 const messageBox = document.getElementById('messageBox');
 const audio = document.getElementById('bg-music');
 
-// Messages when tapping No
 const noMessages = [
   "Oh come on 😏",
   "Baby girl is growing wings now 👩🏽‍🦯➡️",
@@ -96,9 +86,17 @@ const noMessages = [
   "At this point, you hate me 🤧🥲"
 ];
 
-// Track if No was tapped
 let tappedNo = false;
 let noIndex = 0;
+
+// Position Yes over No initially
+function positionYesOverNo() {
+  const noRect = noBtn.getBoundingClientRect();
+  yesBtn.style.left = noRect.left + 'px';
+  yesBtn.style.top = noRect.top + 'px';
+}
+window.onload = positionYesOverNo;
+window.onresize = positionYesOverNo;
 
 // Spawn hearts
 function spawnHeart(x, y){
@@ -113,49 +111,47 @@ function spawnHeart(x, y){
   setTimeout(()=>heart.remove(), 4000 + Math.random()*1500);
 }
 
-// No button behavior
+// No button click
 noBtn.addEventListener('click', ()=>{
   tappedNo = true;
-
-  // Show next No message instantly
   if(noIndex < noMessages.length){
-    messageBox.style.display='block';
     messageBox.textContent = noMessages[noIndex];
     noIndex++;
   }
-
-  // Increase Yes button size instantly & pulse
   const currentScale = yesBtn.style.transform.replace(/[^0-9.]/g,'');
   const newScale = currentScale ? parseFloat(currentScale)+0.15 : 1.15;
   yesBtn.style.transform = `scale(${newScale})`;
-  yesBtn.style.animation='pulse 1s infinite';
 });
 
 // Yes button click
 yesBtn.addEventListener('click', ()=>{
   yesBtn.style.display='none';
   noBtn.style.display='none';
-  messageBox.style.display='block';
 
-  // Play music immediately
+  // Play music
   audio.play().catch(()=>alert("Tap screen to enable music!"));
 
-  // Show final message instantly
+  // Final message depending on No tap
   if(tappedNo){
     messageBox.textContent = "Wow so I had to force you 💔😔, anyways I’ll take it";
   } else {
     messageBox.textContent = "Wow we are so interlinked ❤️";
   }
 
-  // Spawn continuous hearts rapidly
+  // Add playful follow-up message after 1 second
+  setTimeout(()=>{
+    messageBox.textContent += "\n\nTo officially accept, send me a voice note saying yes (definitely not because I think it’d be nice to have 🙂)";
+  },1000);
+
+  // Continuous hearts
   setInterval(()=>{
     spawnHeart(Math.random()*window.innerWidth, window.innerHeight);
   },250);
 });
 
-// Hearts appear wherever she taps anywhere
+// Hearts on tap anywhere
 document.addEventListener('click',(e)=>{
-  if(yesBtn.style.display!=='none'){ // before Yes click
+  if(yesBtn.style.display!=='none'){
     spawnHeart(e.clientX,e.clientY);
   }
 });
