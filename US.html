@@ -29,40 +29,50 @@
     cursor: pointer;
     margin: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.2s, top 0.2s, left 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     color: white;
     position: relative;
   }
 
-  .btn:hover { transform: scale(1.1); }
-
   #yesBtn { background: #e91e63; }
   #noBtn { background: #9c27b0; }
+
+  /* Pulse animation for Yes button */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
 
   #messageBox {
     font-size: 28px;
     margin-top: 50px;
     display: none;
-    animation: fadeIn 1s forwards;
     min-height: 40px;
   }
 
-  @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-  }
-
-  /* Floating hearts animation */
+  /* Hearts */
   .heart {
     position: absolute;
     font-size: 24px;
     animation: floatUp linear infinite;
     opacity: 0.8;
+    pointer-events: none;
   }
 
   @keyframes floatUp {
     0% { transform: translateY(0) scale(1); opacity: 0.8; }
     100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+  }
+
+  /* Confetti */
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    opacity: 0.9;
+    pointer-events: none;
   }
 </style>
 </head>
@@ -87,7 +97,7 @@ const noBtn = document.getElementById('noBtn');
 const messageBox = document.getElementById('messageBox');
 const audio = document.getElementById('bg-music');
 
-// Messages that appear when she tries to click No
+// Messages when No is hovered
 const noMessages = [
   "Come on, just accept! 💖",
   "You know you love me, or don’t you? 😜",
@@ -96,7 +106,7 @@ const noMessages = [
   "You can’t resist forever 😉"
 ];
 
-// Messages after she finally clicks Yes
+// Messages after Yes is clicked
 const yesMessages = [
   "We can watch Bridget together if you say so, come on 💖",
   "Yayy we are so interlinked! ❤️",
@@ -107,65 +117,87 @@ const yesMessages = [
   "Just you and me 💖"
 ];
 
-// Function to create floating hearts
-function createHearts() {
-  setInterval(() => {
-    const heart = document.createElement('div');
-    heart.className = 'heart';
-    heart.style.left = Math.random() * window.innerWidth + 'px';
-    heart.style.fontSize = 20 + Math.random() * 30 + 'px';
-    heart.style.color = ['#ff0000','#ff69b4','#ff1493','#ffb6c1'][Math.floor(Math.random()*4)];
-    heart.textContent = '❤️';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 5000 + Math.random()*3000);
-  }, 400);
+// Floating hearts
+function spawnHeart(x, y){
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.style.left = x + 'px';
+  heart.style.top = y + 'px';
+  heart.style.fontSize = 20 + Math.random()*30 + 'px';
+  heart.style.color = ['#ff0000','#ff69b4','#ff1493','#ffb6c1'][Math.floor(Math.random()*4)];
+  heart.textContent = '❤️';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(), 5000 + Math.random()*2000);
 }
 
-// Counter to show no messages one by one
+// Confetti burst
+function confettiBurst(){
+  for(let i=0;i<100;i++){
+    const conf = document.createElement('div');
+    conf.className='confetti';
+    conf.style.left = Math.random()*window.innerWidth+'px';
+    conf.style.top = Math.random()*window.innerHeight+'px';
+    conf.style.backgroundColor = ['#ff0000','#ff69b4','#ff1493','#ffc3a0'][Math.floor(Math.random()*4)];
+    conf.style.width = conf.style.height = (5+Math.random()*10)+'px';
+    document.body.appendChild(conf);
+    setTimeout(()=>conf.remove(),3000);
+  }
+}
+
+// Increase Yes button on No hover
 let noCounter = 0;
-
-// Make No button playful
-noBtn.addEventListener('mouseover', () => {
-  // Move No button randomly
-  noBtn.style.top = (Math.random() * 50) + "px";
-  noBtn.style.left = (Math.random() * 50) + "px";
-  // Make Yes button grow
-  yesBtn.style.transform = "scale(" + (1.1 + Math.random()*0.3) + ")";
-
-  // Show a playful message
+noBtn.addEventListener('mouseover', ()=>{
   if(noCounter < noMessages.length){
-    messageBox.style.display = 'block';
-    messageBox.textContent = noMessages[noCounter];
+    messageBox.style.display='block';
+    messageBox.textContent=noMessages[noCounter];
     noCounter++;
+  }
+  // Increase size & pulse
+  const currentScale = yesBtn.style.transform.replace(/[^0-9.]/g,'');
+  const newScale = currentScale ? parseFloat(currentScale)+0.15 : 1.15;
+  yesBtn.style.transform = `scale(${newScale})`;
+  yesBtn.style.animation='pulse 1s infinite';
+});
+
+// Make hearts appear on tap/click anywhere
+document.addEventListener('click',(e)=>{
+  if(yesBtn.style.display!=='none'){ // only before Yes clicked
+    spawnHeart(e.clientX, e.clientY);
   }
 });
 
 // Yes button click
-yesBtn.addEventListener('click', () => {
-  yesBtn.style.display = 'none';
-  noBtn.style.display = 'none';
-  messageBox.style.display = 'block';
+yesBtn.addEventListener('click',()=>{
+  yesBtn.style.display='none';
+  noBtn.style.display='none';
+  messageBox.style.display='block';
 
   // Play music
-  audio.play().catch(() => alert("Tap screen to enable music!"));
+  audio.play().catch(()=>alert("Tap screen to enable music!"));
 
-  // Show Yes messages sequentially
-  let index = 0;
-  messageBox.textContent = yesMessages[index];
+  // Show Yes messages faster
+  let index=0;
+  messageBox.textContent=yesMessages[index];
   index++;
 
-  const msgInterval = setInterval(() => {
-    if(index < yesMessages.length){
-      messageBox.textContent = yesMessages[index];
+  const msgInterval=setInterval(()=>{
+    if(index<yesMessages.length){
+      messageBox.textContent=yesMessages[index];
       index++;
-    } else {
+    } else{
       clearInterval(msgInterval);
-      // Start continuous hearts
-      createHearts();
+      createHeartsContinuous();
+      confettiBurst();
     }
-  }, 4000); // 4 seconds per message
+  },1500); // faster messages
 });
-</script>
 
+// Continuous hearts
+function createHeartsContinuous(){
+  setInterval(()=>{
+    spawnHeart(Math.random()*window.innerWidth, window.innerHeight);
+  },300);
+}
+</script>
 </body>
 </html>
