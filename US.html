@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valentine Demo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      background: linear-gradient(to bottom, #ffafbd, #ffc3a0);
+      overflow: hidden;
+      height: 100vh;
+      position: relative;
+      color: white;
+    }
+
+    h1 {
+      margin-top: 50px;
+      font-size: 32px;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+    }
+
+    #yesBtn { background: #e91e63; }
+    #noBtn { background: #9c27b0; }
+
+    #message, #secondMessage {
+      font-size: 28px;
+      margin-top: 50px;
+      display: none;
+      animation: fadeIn 2s forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    /* Floating hearts animation */
+    .heart {
+      position: absolute;
+      font-size: 24px;
+      animation: floatUp linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Will you be my Valentine? 💖</h1>
+  
+  <button class="btn" id="yesBtn">Yes!</button>
+  <button class="btn" id="noBtn">No 😢</button>
+  
+  <div id="message">We can watch Bridget together if you say so, come on 💖</div>
+  <div id="secondMessage">Yayy we are so interlinked! ❤️</div>
+
+  <!-- Background music -->
+  <audio id="bg-music" loop>
+    <source src="romantic.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const message = document.getElementById('message');
+    const secondMessage = document.getElementById('secondMessage');
+    const audio = document.getElementById('bg-music');
+
+    // Heart animation
+    function createHearts() {
+      setInterval(() => {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.style.left = Math.random() * window.innerWidth + 'px';
+        heart.style.fontSize = 20 + Math.random() * 30 + 'px';
+        heart.style.color = ['#ff0000','#ff69b4','#ff1493','#ffb6c1'][Math.floor(Math.random()*4)];
+        heart.textContent = '❤️';
+        document.body.appendChild(heart);
+        setTimeout(() => { heart.remove(); }, 5000 + Math.random()*3000);
+      }, 400);
+    }
+
+    yesBtn.addEventListener('click', () => {
+      // Hide buttons
+      yesBtn.style.display = 'none';
+      noBtn.style.display = 'none';
+      // Show first message
+      message.style.display = 'block';
+      
+      // Play music (works on mobile after click)
+      audio.play().catch(() => {
+        alert("Tap screen to enable music!");
+      });
+
+      // Start hearts after second message
+      setTimeout(() => {
+        message.style.display = 'none';
+        secondMessage.style.display = 'block';
+        createHearts();
+      }, 4000); // 4-second delay for first message
+    });
+
+    noBtn.addEventListener('click', () => {
+      noBtn.textContent = "It's okay 😢";
+      yesBtn.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
