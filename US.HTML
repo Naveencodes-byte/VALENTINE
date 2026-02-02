@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Multiverse Valentine 💌</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    color: #fff;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.95);
+    color: #222;
+    padding: 25px;
+    border-radius: 25px;
+    text-align: center;
+    max-width: 380px;
+    width: 92%;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+
+  .couple-img {
+    width: 100%;
+    border-radius: 18px;
+    margin-bottom: 15px;
+  }
+
+  h1 {
+    color: #e63946;
+    margin-bottom: 8px;
+  }
+
+  .poem {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+
+  .tease {
+    font-size: 14px;
+    color: #555;
+    margin-top: 8px;
+    min-height: 20px;
+  }
+
+  .buttons {
+    margin-top: 20px;
+    position: relative;
+    height: 90px;
+  }
+
+  button {
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    position: absolute;
+    transition: all 0.3s ease;
+  }
+
+  #yes {
+    background: #e63946;
+    color: white;
+    left: 18%;
+  }
+
+  #no {
+    background: #ccc;
+    color: #333;
+    right: 18%;
+  }
+
+  .final {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, #ff758c, #1f1c2c);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    z-index: 100;
+    animation: fadeIn 1s ease;
+  }
+
+  .final h2 {
+    font-size: 36px;
+  }
+
+  .final p {
+    font-size: 22px;
+    margin-top: 20px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .heart {
+    position: fixed;
+    bottom: -40px;
+    width: 36px;
+    animation: float 6s linear infinite;
+    opacity: 0.9;
+    z-index: 1;
+  }
+
+  @keyframes float {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-120vh); opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <img src="couple.jpg" class="couple-img" alt="Love">
+
+  <h1>Mandy 💖</h1>
+
+  <div class="poem">
+    In every universe, in every thread,<br>
+    Like Peter to Gamora, Gwen to her web,<br>
+    Somehow, some way, I still find you —<br>
+    So tell me love… what do heroes do? 💫
+  </div>
+
+  <strong>Will you be my Valentine?</strong>
+
+  <div class="tease" id="tease"></div>
+
+  <div class="buttons">
+    <button id="yes">YES 💕</button>
+    <button id="no">NO 😭</button>
+  </div>
+</div>
+
+<div class="final" id="final">
+  <div>
+    <h2>💘 Multiverse Confirmed 💘</h2>
+    <p>
+      Mandy, you were written into my story.<br>
+      Not by fate — but by choice.<br><br>
+      <strong>Happy Valentine’s ❤️</strong><br><br>
+      — Naveen
+    </p>
+  </div>
+</div>
+
+<script>
+  const yes = document.getElementById("yes");
+  const no = document.getElementById("no");
+  const final = document.getElementById("final");
+  const tease = document.getElementById("tease");
+
+  let yesScale = 1;
+  let teaseMessages = [
+    "Come on… stop joking 😏",
+    "Be serious now 😭",
+    "Even Peter chased Gamora harder than this",
+    "Gwen didn’t say no forever 👀",
+    "You KNOW you want me as your Valentine 💘"
+  ];
+  let teaseIndex = 0;
+
+  no.addEventListener("click", () => {
+    yesScale += 0.4;
+    yes.style.transform = `scale(${yesScale})`;
+
+    const x = Math.random() * 220 - 110;
+    const y = Math.random() * 90 - 45;
+    no.style.transform = `translate(${x}px, ${y}px) scale(0.8)`;
+
+    tease.textContent = teaseMessages[teaseIndex % teaseMessages.length];
+    teaseIndex++;
+  });
+
+  yes.addEventListener("click", () => {
+    final.style.display = "flex";
+  });
+
+  function createHeart() {
+    const heart = document.createElement("img");
+    heart.src = "heart.png";
+    heart.className = "heart";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = 4 + Math.random() * 4 + "s";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 7000);
+  }
+
+  setInterval(createHeart, 500);
+</script>
+
+</body>
+</html>
