@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Valentine Demo</title>
+<title>Peter & Gwen Valentine</title>
 <style>
   body {
     margin: 0;
@@ -45,7 +45,7 @@
   }
 
   #messageBox {
-    font-size: 28px;
+    font-size: 26px;
     margin-top: 50px;
     display: none;
     min-height: 40px;
@@ -64,21 +64,11 @@
     0% { transform: translateY(0) scale(1); opacity: 0.8; }
     100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
   }
-
-  /* Confetti */
-  .confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: white;
-    opacity: 0.9;
-    pointer-events: none;
-  }
 </style>
 </head>
 <body>
 
-<h1>Will you be my Valentine? 💖</h1>
+<h1>Will you be my Valentine? 👀</h1>
 
 <button class="btn" id="yesBtn">Yes!</button>
 <button class="btn" id="noBtn">No 😢</button>
@@ -97,107 +87,78 @@ const noBtn = document.getElementById('noBtn');
 const messageBox = document.getElementById('messageBox');
 const audio = document.getElementById('bg-music');
 
-// Messages when No is hovered
+// Messages when tapping No
 const noMessages = [
-  "Come on, just accept! 💖",
-  "You know you love me, or don’t you? 😜",
-  "Wow, this Ozempic girl wants me to give up 😅",
-  "Just say yes, it’s easier 😍",
-  "You can’t resist forever 😉"
+  "Oh come on 😏",
+  "Baby girl is growing wings now 👩🏽‍🦯➡️",
+  "Acting as if we aren’t meant for each other 🤷🏽",
+  "Wow so you still haven’t said yes 😭😔",
+  "At this point, you hate me 🤧🥲"
 ];
 
-// Messages after Yes is clicked
-const yesMessages = [
-  "We can watch Bridget together if you say so, come on 💖",
-  "Yayy we are so interlinked! ❤️",
-  "Gamora would be jealous 😜",
-  "Peter and Gwen vibes ❤️",
-  "Us forever 💞",
-  "Adventure awaits us 🌟",
-  "Just you and me 💖"
-];
+// Track if No was tapped
+let tappedNo = false;
+let noIndex = 0;
 
-// Floating hearts
+// Spawn hearts
 function spawnHeart(x, y){
   const heart = document.createElement('div');
   heart.className = 'heart';
   heart.style.left = x + 'px';
   heart.style.top = y + 'px';
   heart.style.fontSize = 20 + Math.random()*30 + 'px';
-  heart.style.color = ['#ff0000','#ff69b4','#ff1493','#ffb6c1'][Math.floor(Math.random()*4)];
+  heart.style.color = ['#ff0000','#ff69b4','#ff1493','#ffc3a0'][Math.floor(Math.random()*4)];
   heart.textContent = '❤️';
   document.body.appendChild(heart);
-  setTimeout(()=>heart.remove(), 5000 + Math.random()*2000);
+  setTimeout(()=>heart.remove(), 4000 + Math.random()*1500);
 }
 
-// Confetti burst
-function confettiBurst(){
-  for(let i=0;i<100;i++){
-    const conf = document.createElement('div');
-    conf.className='confetti';
-    conf.style.left = Math.random()*window.innerWidth+'px';
-    conf.style.top = Math.random()*window.innerHeight+'px';
-    conf.style.backgroundColor = ['#ff0000','#ff69b4','#ff1493','#ffc3a0'][Math.floor(Math.random()*4)];
-    conf.style.width = conf.style.height = (5+Math.random()*10)+'px';
-    document.body.appendChild(conf);
-    setTimeout(()=>conf.remove(),3000);
-  }
-}
+// No button behavior
+noBtn.addEventListener('click', ()=>{
+  tappedNo = true;
 
-// Increase Yes button on No hover
-let noCounter = 0;
-noBtn.addEventListener('mouseover', ()=>{
-  if(noCounter < noMessages.length){
+  // Show next No message instantly
+  if(noIndex < noMessages.length){
     messageBox.style.display='block';
-    messageBox.textContent=noMessages[noCounter];
-    noCounter++;
+    messageBox.textContent = noMessages[noIndex];
+    noIndex++;
   }
-  // Increase size & pulse
+
+  // Increase Yes button size instantly & pulse
   const currentScale = yesBtn.style.transform.replace(/[^0-9.]/g,'');
   const newScale = currentScale ? parseFloat(currentScale)+0.15 : 1.15;
   yesBtn.style.transform = `scale(${newScale})`;
   yesBtn.style.animation='pulse 1s infinite';
 });
 
-// Make hearts appear on tap/click anywhere
-document.addEventListener('click',(e)=>{
-  if(yesBtn.style.display!=='none'){ // only before Yes clicked
-    spawnHeart(e.clientX, e.clientY);
-  }
-});
-
 // Yes button click
-yesBtn.addEventListener('click',()=>{
+yesBtn.addEventListener('click', ()=>{
   yesBtn.style.display='none';
   noBtn.style.display='none';
   messageBox.style.display='block';
 
-  // Play music
+  // Play music immediately
   audio.play().catch(()=>alert("Tap screen to enable music!"));
 
-  // Show Yes messages faster
-  let index=0;
-  messageBox.textContent=yesMessages[index];
-  index++;
+  // Show final message instantly
+  if(tappedNo){
+    messageBox.textContent = "Wow so I had to force you 💔😔, anyways I’ll take it";
+  } else {
+    messageBox.textContent = "Wow we are so interlinked ❤️";
+  }
 
-  const msgInterval=setInterval(()=>{
-    if(index<yesMessages.length){
-      messageBox.textContent=yesMessages[index];
-      index++;
-    } else{
-      clearInterval(msgInterval);
-      createHeartsContinuous();
-      confettiBurst();
-    }
-  },1500); // faster messages
-});
-
-// Continuous hearts
-function createHeartsContinuous(){
+  // Spawn continuous hearts rapidly
   setInterval(()=>{
     spawnHeart(Math.random()*window.innerWidth, window.innerHeight);
-  },300);
-}
+  },250);
+});
+
+// Hearts appear wherever she taps anywhere
+document.addEventListener('click',(e)=>{
+  if(yesBtn.style.display!=='none'){ // before Yes click
+    spawnHeart(e.clientX,e.clientY);
+  }
+});
 </script>
 </body>
 </html>
